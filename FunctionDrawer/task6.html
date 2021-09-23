@@ -1,0 +1,160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module task6</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>task6</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:d%3A%5Conedrive%5Cprogramowanie%5Cpython%5Csemesterii%5Clist6%5Ctask6.py">d:\onedrive\programowanie\python\semesterii\list6\task6.py</a></font></td></tr></table>
+    <p><tt>Create&nbsp;a&nbsp;window&nbsp;application&nbsp;for&nbsp;drawing&nbsp;plots&nbsp;on&nbsp;the&nbsp;canvas&nbsp;of&nbsp;passed&nbsp;functions.<br>
+Following&nbsp;function&nbsp;are&nbsp;adding&nbsp;to&nbsp;the&nbsp;canvas.&nbsp;Pass&nbsp;next&nbsp;function&nbsp;after&nbsp;clearing&nbsp;entry<br>
+or&nbsp;pass&nbsp;few&nbsp;functions&nbsp;separated&nbsp;by&nbsp;semicolons.<br>
+&nbsp;<br>
+As&nbsp;default&nbsp;functions&nbsp;are&nbsp;drawing&nbsp;in&nbsp;the&nbsp;Cartesian&nbsp;coordinate&nbsp;system&nbsp;on&nbsp;interval&nbsp;[-10,&nbsp;10]<br>
+and&nbsp;bordered&nbsp;on&nbsp;Y&nbsp;axis&nbsp;by&nbsp;-10&nbsp;and&nbsp;10.<br>
+&nbsp;<br>
+User&nbsp;may&nbsp;change&nbsp;both&nbsp;intervals&nbsp;by&nbsp;passing&nbsp;two&nbsp;numbers&nbsp;separated&nbsp;by&nbsp;comma.&nbsp;User&nbsp;may&nbsp;change<br>
+labels&nbsp;of&nbsp;both&nbsp;axis&nbsp;and&nbsp;plot.<br>
+&nbsp;<br>
+There&nbsp;are&nbsp;supplemented&nbsp;buttons&nbsp;for&nbsp;passing&nbsp;elemental&nbsp;operators&nbsp;and&nbsp;functions&nbsp;at&nbsp;the&nbsp;end<br>
+of&nbsp;the&nbsp;formula&nbsp;entry.&nbsp;<br>
+&nbsp;<br>
+As&nbsp;variable&nbsp;pass&nbsp;x.&nbsp;Formula&nbsp;should&nbsp;fits&nbsp;evaluations&nbsp;in&nbsp;the&nbsp;sympy&nbsp;module.&nbsp;However&nbsp;*&nbsp;<br>
+symbol&nbsp;may&nbsp;be&nbsp;omitted&nbsp;beetwen&nbsp;number&nbsp;and&nbsp;variable.&nbsp;Also&nbsp;user&nbsp;may&nbsp;insert&nbsp;^&nbsp;as&nbsp;power,&nbsp;comma&nbsp;<br>
+as&nbsp;decimal&nbsp;separatot&nbsp;and&nbsp;||&nbsp;as&nbsp;absolute&nbsp;value.&nbsp;Supported&nbsp;math&nbsp;functions:<br>
+sin,&nbsp;csc,&nbsp;cos,&nbsp;sec,&nbsp;tan,&nbsp;cot,&nbsp;asin,&nbsp;acsc,&nbsp;acos,&nbsp;atan,&nbsp;acot,&nbsp;ceiling,&nbsp;floor,&nbsp;frac,&nbsp;exp,&nbsp;sqrt,<br>
+log,&nbsp;Abs.<br>
+&nbsp;<br>
+&nbsp;<br>
+Draw&nbsp;plots&nbsp;on&nbsp;canvas&nbsp;by&nbsp;pressing&nbsp;Draw&nbsp;button&nbsp;or&nbsp;Enter.<br>
+Exit&nbsp;program&nbsp;by&nbsp;pressing&nbsp;Exit&nbsp;button&nbsp;or&nbsp;Esc.<br>
+Hide/show&nbsp;legend&nbsp;for&nbsp;functions&nbsp;from&nbsp;entry&nbsp;by&nbsp;pressing&nbsp;Check&nbsp;button.<br>
+Delete&nbsp;all&nbsp;plots&nbsp;from&nbsp;canvas&nbsp;by&nbsp;pressing&nbsp;Clear&nbsp;canvas&nbsp;button.<br>
+&nbsp;<br>
+Return&nbsp;errors&nbsp;in&nbsp;separated&nbsp;window&nbsp;as&nbsp;message.</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="numpy.html">numpy</a><br>
+</td><td width="25%" valign=top><a href="re.html">re</a><br>
+</td><td width="25%" valign=top><a href="tkinter.html">tkinter</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-check"><strong>check</strong></a>()</dt><dd><tt>Show&nbsp;or&nbsp;hide&nbsp;the&nbsp;legend&nbsp;dependly&nbsp;of&nbsp;the&nbsp;fact&nbsp;if&nbsp;already&nbsp;legend&nbsp;is&nbsp;shown.</tt></dd></dl>
+ <dl><dt><a name="-clearCanvas"><strong>clearCanvas</strong></a>()</dt><dd><tt>Delete&nbsp;all&nbsp;charts&nbsp;and&nbsp;legend&nbsp;if&nbsp;exist&nbsp;from&nbsp;the&nbsp;canvas.&nbsp;If&nbsp;canvas&nbsp;are&nbsp;already&nbsp;clear&nbsp;do&nbsp;nothing.</tt></dd></dl>
+ <dl><dt><a name="-draw"><strong>draw</strong></a>(event)</dt><dd><tt>Draw&nbsp;plots&nbsp;of&nbsp;the&nbsp;given&nbsp;functions&nbsp;on&nbsp;given&nbsp;inetrval&nbsp;and&nbsp;bounded&nbsp;by&nbsp;given&nbsp;values.<br>
+&nbsp;<br>
+Get&nbsp;formula&nbsp;from&nbsp;main&nbsp;entry.&nbsp;Substitute&nbsp;comma&nbsp;for&nbsp;dot,&nbsp;|x|&nbsp;for&nbsp;Abs(x),&nbsp;ctan(x)&nbsp;for&nbsp;cot(x).<br>
+If&nbsp;passed&nbsp;in&nbsp;formula&nbsp;curly&nbsp;or&nbsp;square&nbsp;bracket&nbsp;substitute&nbsp;for&nbsp;parenthesis.&nbsp;If&nbsp;passed&nbsp;variable<br>
+is&nbsp;surronded&nbsp;by&nbsp;numbers&nbsp;put&nbsp;multiply&nbsp;operator.&nbsp;Check&nbsp;if&nbsp;finally&nbsp;formula&nbsp;is&nbsp;valid&nbsp;and&nbsp;compute<br>
+its&nbsp;value&nbsp;for&nbsp;set&nbsp;interval.&nbsp;Draw&nbsp;plot&nbsp;and&nbsp;print&nbsp;on&nbsp;canvas.<br>
+&nbsp;<br>
+Parameters<br>
+----------<br>
+event:&nbsp;event<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Enter&nbsp;key&nbsp;or&nbsp;Button&nbsp;draw&nbsp;for&nbsp;activation.<br>
+&nbsp;<br>
+Raises<br>
+------<br>
+ValueError<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Cannot&nbsp;sympify&nbsp;formula.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Missed&nbsp;brackets<br>
+&nbsp;<br>
+Errors<br>
+------<br>
+Insert&nbsp;value&nbsp;to&nbsp;every&nbsp;input.<br>
+Invalid&nbsp;number&nbsp;of&nbsp;brackets.<br>
+Invalid&nbsp;function&nbsp;passed.<br>
+Missing&nbsp;operators&nbsp;beetwen&nbsp;functions.<br>
+No&nbsp;argument&nbsp;passed&nbsp;to&nbsp;function.<br>
+Ranges&nbsp;should&nbsp;be&nbsp;past&nbsp;in&nbsp;form&nbsp;X&nbsp;Y.<br>
+Right&nbsp;border&nbsp;of&nbsp;the&nbsp;interval&nbsp;should&nbsp;be&nbsp;greater&nbsp;than&nbsp;left.<br>
+Values&nbsp;should&nbsp;be&nbsp;floating&nbsp;points&nbsp;or&nbsp;integers.</tt></dd></dl>
+ <dl><dt><a name="-exit"><strong>exit</strong></a>(status=None, /)</dt><dd><tt>Exit&nbsp;the&nbsp;interpreter&nbsp;by&nbsp;raising&nbsp;SystemExit(status).<br>
+&nbsp;<br>
+If&nbsp;the&nbsp;status&nbsp;is&nbsp;omitted&nbsp;or&nbsp;None,&nbsp;it&nbsp;defaults&nbsp;to&nbsp;zero&nbsp;(i.e.,&nbsp;success).<br>
+If&nbsp;the&nbsp;status&nbsp;is&nbsp;an&nbsp;integer,&nbsp;it&nbsp;will&nbsp;be&nbsp;used&nbsp;as&nbsp;the&nbsp;system&nbsp;exit&nbsp;status.<br>
+If&nbsp;it&nbsp;is&nbsp;another&nbsp;kind&nbsp;of&nbsp;object,&nbsp;it&nbsp;will&nbsp;be&nbsp;printed&nbsp;and&nbsp;the&nbsp;system<br>
+exit&nbsp;status&nbsp;will&nbsp;be&nbsp;one&nbsp;(i.e.,&nbsp;failure).</tt></dd></dl>
+ <dl><dt><a name="-pAbs"><strong>pAbs</strong></a>()</dt><dd><tt>Pass&nbsp;|x|&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-pcos"><strong>pcos</strong></a>()</dt><dd><tt>Pass&nbsp;cos(x)&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-pctan"><strong>pctan</strong></a>()</dt><dd><tt>Pass&nbsp;ctan(x)&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-pdiv"><strong>pdiv</strong></a>()</dt><dd><tt>Pass&nbsp;/&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-pexp"><strong>pexp</strong></a>()</dt><dd><tt>Pass&nbsp;exp(x)&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-pleft"><strong>pleft</strong></a>()</dt><dd><tt>Pass&nbsp;(&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-plog"><strong>plog</strong></a>()</dt><dd><tt>Pass&nbsp;log(x)&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-pminus"><strong>pminus</strong></a>()</dt><dd><tt>Pass&nbsp;-&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-pmul"><strong>pmul</strong></a>()</dt><dd><tt>Pass&nbsp;*&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-pplus"><strong>pplus</strong></a>()</dt><dd><tt>Pass&nbsp;+&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-pright"><strong>pright</strong></a>()</dt><dd><tt>Pass&nbsp;)&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-psin"><strong>psin</strong></a>()</dt><dd><tt>Pass&nbsp;sin(x)&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-psqrt"><strong>psqrt</strong></a>()</dt><dd><tt>Pass&nbsp;sqrt(x)&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-ptan"><strong>ptan</strong></a>()</dt><dd><tt>Pass&nbsp;tan(x)&nbsp;on&nbsp;to&nbsp;the&nbsp;formula&nbsp;entry.</tt></dd></dl>
+ <dl><dt><a name="-system"><strong>system</strong></a>(command)</dt><dd><tt>Execute&nbsp;the&nbsp;command&nbsp;in&nbsp;a&nbsp;subshell.</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>ax</strong> = &lt;AxesSubplot:&gt;<br>
+<strong>bAbs</strong> = &lt;tkinter.Button object .!button11&gt;<br>
+<strong>bcos</strong> = &lt;tkinter.Button object .!button6&gt;<br>
+<strong>bctan</strong> = &lt;tkinter.Button object .!button8&gt;<br>
+<strong>bdiv</strong> = &lt;tkinter.Button object .!button16&gt;<br>
+<strong>bexp</strong> = &lt;tkinter.Button object .!button9&gt;<br>
+<strong>bg</strong> = &lt;tkinter.PhotoImage object&gt;<br>
+<strong>bg_pan</strong> = &lt;tkinter.Canvas object .!panedwindow.!canvas&gt;<br>
+<strong>bleft</strong> = &lt;tkinter.Button object .!button13&gt;<br>
+<strong>blog</strong> = &lt;tkinter.Button object .!button10&gt;<br>
+<strong>bminus</strong> = &lt;tkinter.Button object .!button18&gt;<br>
+<strong>bmul</strong> = &lt;tkinter.Button object .!button15&gt;<br>
+<strong>bplus</strong> = &lt;tkinter.Button object .!button17&gt;<br>
+<strong>bright</strong> = &lt;tkinter.Button object .!button14&gt;<br>
+<strong>bsin</strong> = &lt;tkinter.Button object .!button5&gt;<br>
+<strong>bsqrt</strong> = &lt;tkinter.Button object .!button12&gt;<br>
+<strong>btan</strong> = &lt;tkinter.Button object .!button7&gt;<br>
+<strong>canv</strong> = &lt;matplotlib.backends.backend_tkagg.FigureCanvasTkAgg object&gt;<br>
+<strong>chk</strong> = &lt;tkinter.Button object .!button4&gt;<br>
+<strong>clr</strong> = &lt;tkinter.Button object .!button3&gt;<br>
+<strong>drw</strong> = &lt;tkinter.Button object .!button2&gt;<br>
+<strong>exi</strong> = &lt;tkinter.Button object .!button&gt;<br>
+<strong>fig</strong> = &lt;Figure size 735x592 with 1 Axes&gt;<br>
+<strong>formula</strong> = &lt;tkinter.StringVar object&gt;<br>
+<strong>interv</strong> = &lt;tkinter.Label object .!label&gt;<br>
+<strong>mainentr</strong> = &lt;tkinter.Entry object .!entry&gt;<br>
+<strong>name_</strong> = &lt;tkinter.Label object .!label3&gt;<br>
+<strong>namex</strong> = &lt;tkinter.Label object .!label4&gt;<br>
+<strong>namey</strong> = &lt;tkinter.Label object .!label5&gt;<br>
+<strong>pan1</strong> = &lt;tkinter.PanedWindow object .!panedwindow&gt;<br>
+<strong>pan2</strong> = &lt;tkinter.PanedWindow object .!panedwindow.!panedwindow&gt;<br>
+<strong>plot_title</strong> = &lt;tkinter.StringVar object&gt;<br>
+<strong>plttitle</strong> = &lt;tkinter.Entry object .!entry4&gt;<br>
+<strong>pltxlable</strong> = &lt;tkinter.Entry object .!entry5&gt;<br>
+<strong>pltylable</strong> = &lt;tkinter.Entry object .!entry6&gt;<br>
+<strong>prec</strong> = 500<br>
+<strong>root</strong> = &lt;tkinter.Tk object .&gt;<br>
+<strong>showLegend</strong> = &lt;tkinter.IntVar object&gt;<br>
+<strong>supportedfunc</strong> = ['sin', 'csc', 'cos', 'sec', 'tan', 'cot', 'asin', 'acsc', 'acos', 'atan', 'acot', 'ceiling', 'floor', 'frac', 'exp', 'sqrt', 'log', 'Abs']<br>
+<strong>x</strong> = x<br>
+<strong>x_label</strong> = &lt;tkinter.StringVar object&gt;<br>
+<strong>x_range</strong> = &lt;tkinter.StringVar object&gt;<br>
+<strong>xrang</strong> = &lt;tkinter.Entry object .!entry2&gt;<br>
+<strong>y_label</strong> = &lt;tkinter.StringVar object&gt;<br>
+<strong>y_range</strong> = &lt;tkinter.StringVar object&gt;<br>
+<strong>ybound</strong> = &lt;tkinter.Label object .!label2&gt;<br>
+<strong>yrang</strong> = &lt;tkinter.Entry object .!entry3&gt;</td></tr></table>
+</body></html>

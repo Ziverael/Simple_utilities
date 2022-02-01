@@ -1,4 +1,4 @@
-import Graph_  as gp
+import Graph  as gp
 import queue as qe
 
 class GraphTypeError(Exception):

@@ -1,3 +1,28 @@
+#Kilka uwag:
+#Żeby program działał poprawnie należy doinstalować bibliotekę
+#graphviz
+#oraz interpreter języka graphviz
+#progarm po wywołaniu wykona funkcję testującą
+#tworzy on zarazem grafy AN i AA
+#wizualizacje zwracane są w pliku pdf
+#harmonogramy są też przedstawiane w postaci tekstowej
+#gddzie każdy wierzchołek ma swoje czasy ES, EF, LF, LS oraz opóźnienie
+
+#aby wygenerować harmonogram podaj listę zadań w postaci
+# [ { 'id' : 'zad1',            <--nazwa zadania(wierzchołka)
+#   'time' : 2,                 <--czas trwania zadania
+#   'req' : {}                    <--zadania, które muszą poprzedzać zadanie (uwaga! jeśli A wymaga B, a C wymaga B to w wymaganiach C starczy podać B)
+# },
+#   { 'id' : 'zad2',
+#   'time' : 4,
+#   'req' : {'A'}
+# }
+# ]
+#
+#Więcej przykładów w funkcji testującej
+#z przykładami generowania i zwracania wartości
+
+
 import graphviz #importuję bibliotękę graphviz
 
 
@@ -142,7 +167,7 @@ class Vert():     #klasa reprezentująca wiechołek
 
     def __str__(self):
         # reprezentacja wierzchołka w postaci łańcucha znaków
-        return "Vertex: {}\n time:{}    es:{};  ef:{};  ls:{};  lf:{};  slack:{};\n".format(self.id, self.time, self.es, self.ef, self.ls, self.lf, self.slack)
+        return "Vertex: {}\n time:{}    es:{};  ef:{};  ls:{};  lf:{};  slack:{};\n".format(self.id, self.time, self.es, self.ef, self.ls, self.lf, self.slack) # zwróć łańcuch znaków gdzie w miejscu {} znajdą się wymienione w format wartości w podanej kolejności
 
     def __repr__(self):
         # reprezentacja wierzchołka w postaci łańcucha znaków, jeśli wierzchołek wyświetlany w trybie interaktywnym
@@ -193,19 +218,29 @@ class Harmonogram():    #klasa reprezentująca harmonogram
     def renderAA(self):
         graphviz.Source(self.dotAA()).render('HarmonogramAA')#wygeneruj reprezentacje pdf na podstawie kodu dot sieci AA
 
+    #wróć listę zawierającą ścieżkę krytyczną
+    def get_cpm(self):
+        return self.cricicalPath
 
-    def dotAN(self):  #reprezentacja w języku dot
+    def get_ttime(self):#zwróć całkowity czas trwania projektu
+        return self.early_finish
+
+    def dotAN(self):  #reprezentacja w języku dot (otrzyma on łańcuch znaków, który zinterpretuje)
+        #zmienna out przechowuje ten łańcuch znaków
         out = "digraph G{\n node [shape=record]\n" +\
-        "label = Harmonogram\n"
-        for i in self.startV.get_outs():
-            buff2 = self.verts[i]
-            out += 'Start->{};\n'.format(buff2.id)
+        "label = Harmonogram\n" #inicjalizacja grafu  z kształtem węzłów oraz nagłówkiem
+        for i in self.startV.get_outs(): # w pętli
+            buff2 = self.verts[i]        #pobieraj wierzchołki początkowe
+            if buff2 in self.cricicalPath:
+                out += 'Start->{} [color = "red"];\n'.format(buff2.id) # i zrób od wierzchołka start do nich gałęzie
+            else:
+                out += 'Start->{};\n'.format(buff2.id) # i zrób od wierzchołka start do nich gałęzie
 
-        for i in self.verts:
-            buff1 = self.verts[i]
-            if buff1.get_id() == 'Koniec':
+        for i in self.verts:    #w pętli
+            buff1 = self.verts[i]   #pobieraj wierzchołki
+            if buff1.get_id() == 'Koniec':  # jeżeli to końcowy to pomiń krok
                 continue
-
+            #dodaj reprezentacje danego wierzchołka z jego statystykami patrz metoda format 
             out += '{} [label = "{{ {{ ES:{}|CZAS:{}|EF:    {}}}| {} |{{LF:{} |OPÓŹNIENIE:{}|LF:{}}}}}"];\n'.format(
             buff1.id,
             buff1.es,
@@ -214,21 +249,34 @@ class Harmonogram():    #klasa reprezentująca harmonogram
             buff1.id,
             buff1.ls,
             buff1.slack,
-            buff1.lf)
+            buff1.lf) # tu są kolejne atrybuty wierzchołka, które zostaną dodane do łańcucha znaków
                 
-            for j in buff1.ngh_out:
-                buff2 = self.verts[j]
-                if buff2 in self.cricicalPath and buff1 in self.cricicalPath:
-                    out += '{}->{} [color = "red"];\n '.format(buff1.id, buff2.id)
+            for j in buff1.ngh_out: # przejdź po sąsiadach wierzchołka
+                buff2 = self.verts[j]   #przechowaj sąsiada w zmiennej
+                if buff2 in self.cricicalPath and buff1 in self.cricicalPath: #jeźeli prowadzi przez oba wiezrchołki ścieżka krytyczna
+                    ind = self.cricicalPath.index(buff2)    # pobierz indeks. Mamy pewność, że jest on większy od 0, więc możemy w kolejnym kroku odnieść się do wcześniejszego
+                    if self.cricicalPath[ind - 1] == buff1:
+                        out += '{}->{} [color = "red"];\n '.format(buff1.id, buff2.id)# to pokoloruj na czerwono gałąź
+                    else:
+                        out += '{}->{};\n '.format(buff1.id, buff2.id)  # inaczej poprowadź zwykłą gałąź (bez kolorka)
                 else:
-                    out += '{}->{};\n '.format(buff1.id, buff2.id)
+                    out += '{}->{};\n '.format(buff1.id, buff2.id)  # inaczej poprowadź zwykłą gałąź (bez kolorka)
 
-        out += 'Koniec [label = "Koniec| Całkowity czas:{}"]\n'.format(self.early_finish)
-        return out + '}'
+        out += 'Koniec [label = "Koniec| Całkowity czas:{}"]\n'.format(self.early_finish) # dodaj reprezentację wierzchołka symbolizującego koniec projektu
+        return out + '}' # zwróć łańcuch znaków
 
-    def dotAA(self):
+    def dotAA(self): #to samo co wcześniej, tyle że sieć AA, dlatego tu wartość czasu zadania znajdzie się nad gałęzią, a nie w węźle
+        #pomijam komentarze do tej części, bo prócz tu opisanej zmiany wszystko jest tak samo
         out = "digraph G{\n node [shape=record]\n" +\
         "label = Harmonogram\n"
+
+        for i in self.startV.get_outs(): # w pętli
+            buff2 = self.verts[i]        #pobieraj wierzchołki początkowe
+            if buff2 in self.cricicalPath:
+                out += 'Start->{} [color = "red"];\n'.format(buff2.id) # i zrób od wierzchołka start do nich gałęzie
+            else:
+                out += 'Start->{};\n'.format(buff2.id) # i zrób od wierzchołka start do nich gałęzie
+
         for i in self.verts:
             buff1 = self.verts[i]
             if buff1.get_id() == 'Koniec':
@@ -245,60 +293,67 @@ class Harmonogram():    #klasa reprezentująca harmonogram
         
         
             for j in buff1.ngh_out:
-                    buff2 = self.verts[j]
+                buff2 = self.verts[j]
+                if buff2 in self.cricicalPath:
+                    ind = self.cricicalPath.index(buff2)    # pobierz indeks. Mamy pewność, że jest on większy od 0, więc możemy w kolejnym kroku odnieść się do wcześniejszego
+                    if self.cricicalPath[ind - 1] == buff1:
+                #if buff2 in self.cricicalPath and buff1 in self.cricicalPath: #jeźeli prowadzi przez oba wiezrchołki ścieżka krytyczna
+                        out += '{}->{} [label = "{}" color = "red"];\n '.format(buff1.id, buff2.id, buff1.time)
+                    else:
+                        out += '{}->{} [label = "{}"];\n '.format(buff1.id, buff2.id, buff1.time)
+                else:
                     out += '{}->{} [label = "{}"];\n '.format(buff1.id, buff2.id, buff1.time)
-            out += 'Koniec [label = "Koniec| Całkowity czas:{}"]\n'.format(self.early_finish)
-        
+        out += 'Koniec [label = "Koniec| Całkowity czas:{}"]\n'.format(self.early_finish)
         return out + '}'
     
-    def __str__(self):
-        out = ""
-        for i in self.freq:
-            out += str(self.verts[i]) + "\n"
+    def __str__(self):#reprezentacja harmonogramu w postaci łańcucha  znaków
+        out = "" # zmienna z łańcuchem znaków
+        for i in self.freq: # w kolejności topologicznej
+            out += str(self.verts[i]) + "\n" #do łańcucha dodaj reprezentacje łańcucha każdego z wierzchołków (zdefiniowane w moetodzie __str__ dla wierzchołka)
         return out
 
 
-    def dfs(self, beg):
-        out = []
-        for i in self.verts:
+    def dfs(self, beg): # przeszukiwanie w głąb
+        out = []    #utwórz ppustą listę
+        for i in self.verts:    #ustaw statusy na nieodwiedzone i brak poprzedników dla wszysktich wierzchołków
             self.verts[i].set_prev(-1)
             self.verts[i].set_status(0)
-        beg = self.verts[beg]
-        self.__dfs__(beg, out)
-        return out
+        beg = self.verts[beg] #weź wierzchołek początkowy
+        self.__dfs__(beg, out) # wykonaj metode podrzędną __dfs__
+        return out  #zwróć listę wierzchołków
     
-    def __dfs__(self, vert, out):
-        out.append(vert.get_id())
-        vert.set_status(1)
-        for i in vert.get_outs():
-            if not self.verts[i].get_status():
-                self.verts[i].set_prev(vert)
-                self.__dfs__(self.verts[i], out)
-        vert.set_status(2)
+    def __dfs__(self, vert, out): #metoda podrzędna używana w dfs. Otrzymuje ona listę out, którą przekazuje w kolejnych wywołaniach
+        out.append(vert.get_id()) #dodaj właśnie badany wierzhołek do listy  
+        vert.set_status(1)          #ustaw status na odwiedzony
+        for i in vert.get_outs():   #w pętli po sąsiadach
+            if not self.verts[i].get_status(): #jeśli wierzchołek był niodwiedzony (czyli ma status = 0)
+                self.verts[i].set_prev(vert)    #to ustaw obecnie badany wierzchołek jako jego poprzednik
+                self.__dfs__(self.verts[i], out)# i wykonaj metodę __dfs__ na tym wierzchołki
+        vert.set_status(2)  #ustaw status obecnego wierzchołka na przebadany (2)
 
-    def top_sort(self):          
-        if self.cyclic():
-            raise InvalidGraphError("The graph is cyclic")
-        st = Stack()
-        for i in  self.verts:
+    def top_sort(self):          #sortowanie topologiczne
+        if self.cyclic():        #sprawdź czy graf cykliczny
+            raise InvalidGraphError("The graph is cyclic")  # nie można topologicznie posortować cyklicznego grafu
+        st = Stack()    #utwórz pusty stos
+        for i in  self.verts:   #ustaw początkowe statusy nieodwiedzone i brak poprzedników (-1)
             self.verts[i].set_prev(-1)         
             self.verts[i].set_status(0)
-        for i in self.verts:
-            if not self.verts[i].get_status():
-                self.__top_sort__(self.verts[i], st)
-        out = []
-        while not st.is_empty():
+        for i in self.verts: # w pętli po wszystkich wierzchołkach grafu
+            if not self.verts[i].get_status():  # jeśli wierzchołek nie był jeszcze odwiedzony
+                self.__top_sort__(self.verts[i], st)    #wykonaj na nim metodę podrzędną __top_sort__ z przekazanym stosem
+        out = []    #utwórz pustą listę wierzchołków
+        while not st.is_empty():    #wypakuj stos do listy
             out.append(st.pop())
-        return out
+        return out  #zwróć listę (jest ona posortowana topologicznie)
     
-    def __top_sort__(self, vert, st):
-        vert.set_status(1)
-        for i in vert.get_outs():
-            if not self.verts[i].get_status():
-                self.verts[i].set_prev(vert)
-                self.__top_sort__(self.verts[i], st)
-        vert.set_status(2)
-        st.push(vert.get_id())
+    def __top_sort__(self, vert, st): #metoda podrzędna sortowania topologicznego
+        vert.set_status(1)  #ustaw status wierzchołka na obecnie badany (1)
+        for i in vert.get_outs(): # w pętli po sąsiadach
+            if not self.verts[i].get_status():  #jeżeli jeszcze nieodwiedzony
+                self.verts[i].set_prev(vert)   #ustaw poprzednika sąsiada na obecnie badany wierzchołek
+                self.__top_sort__(self.verts[i], st)    #wykonaj sortowanie topologiczne na sąsiedzie z przekazanym stosem
+        vert.set_status(2)  #ustaw status wierzchołka na przebadany (tzn. odwiedzony/sprawdzony)
+        st.push(vert.get_id()) # połóż na stosie badany wierzchołek
 
     def cyclic(self) -> bool: # sprawdzanie czy graf jest cykliczny
         cache = {}             #słownik zapamiętujący odwiedzone wierzchołki w danej iteracji
@@ -322,66 +377,20 @@ class Harmonogram():    #klasa reprezentująca harmonogram
         del cache[vert.get_id()]
         return False
     
-    """
-    def dijkstra(self):
-        for i in self.verts:
-            self.verts[i].set_status(0) # ustaw wierzchołki na nieodwiedzone
-        qu = PriorityQueue()# utwórz kolejkę priorytetową, na którą trafiać będą kolejne wierzchołko do przetwarzania
-        qu.put((self.startV.get_cost(), self.startV))
-        while not qu.empty():
-            _, vert = qu.get()
-            vert.set_status(1) # zmień status na odwiedzony
-            for i in vert.get_outs():
-                dist = self.verts[i].get_cost()
-                if not self.verts[i].get_status():
-                    new_cost = vert.get_cost() + dist
-                    if new_cost < self.verts[i].get_cost():
-                        qu.put((new_cost, self.verts[i]))
-                        self.verts[i].set_cost(new_cost)
-    """
-    """
-    def bfs(self):
-        for i in self.verts:
-            self.verts[i].set_status(0) #ustaw statusy wierzchołków na nieodwiedzone
-            self.verts[i].set_dist(-1)  #ustaw dystansy na -1
-
-        beg = self.startV   #Rozpocznij procedurę w wierzchołku
-        beg.set_dist(0)
-        beg.set_prev(-1)
-        qu = Queue()
-        qu.enqueue(beg)
-        #out = []
-        while not qu.is_empty():
-            current = qu.dequeue()
-            for i in current.get_outs():
-                if not self.verts[i].get_status():
-                    self.verts[i].set_status(1)
-                    self.verts[i].set_dist(current.get_dist() + self.verts[i].get_slack())
-                    self.verts[i].set_prev(current)
-                    qu.enqueue(self.verts[i])
-            current.set_status(2)
-            #out.append(current)
-        #return out
-
-    def cpm(self):
-        self.bfs()
-        end = self.endV
-        path = 
-    """
-    def cpm(self):
-        current = self.startV
-        cpm = [current]
-        while current.get_outs() != {}:
-            for i in current.get_outs():
-                if not self.verts[i].get_slack():
-                    current = self.verts[i]
-                    cpm.append(current)
-                    #print(current,'<-')
-                    break
-        return cpm
+    def cpm(self): #metoda znajdowania ścieżki krytycznej
+        current = self.startV   #ustaw obecnie badany wierzchołek na wierzchołek startowy
+        cpm = [current]         #dodaj go do listy wierzchołków
+        while current.get_outs() != {}: #dopóki nie dotarłeś na koniec grafu
+            for i in current.get_outs():  #sprawdź listę wierzchołków wychodzących
+                if not self.verts[i].get_slack():   #jeśli jest to wierzchołek ścieżki krytycznej
+                    current = self.verts[i]         #to ustaw go jako obecnie badany
+                    cpm.append(current)             #i dodaj do listy wyjściowej
+                    break                           #przerwij sprawdzanie dla wcześniejszego wierzchołka
+        return cpm                                  # zwróć ścieżkę krytyczną
 
 
-def test():                 #funkcja testująca
+def test(validation = False):                 #funkcja testująca
+                                                #wykonuje kilka testów
     tasks = [               #lista zadań
         {'id' : 'A',
         'time' : 4,
@@ -439,8 +448,8 @@ def test():                 #funkcja testująca
     ]
     gh = Harmonogram(tasks)
     print(gh)
-    #print(gh.start)
-    tasks = [               #przykład z grafem acyklicznym
+
+    tasks = [               #przykład z grafem cyklicznym
         {'id' : 'A',
         'time' : 4,
         'req' : {'B'}
@@ -462,7 +471,56 @@ def test():                 #funkcja testująca
         'req' : {'B', 'C', 'A'}
         }
     ]
+    if validation: # jeśli argument validation to True, to sprawdź, czy podniesie wyjątek dla grafu cyklicznego
+        gh = Harmonogram(tasks)
+    
+    tasks = [      
+        {'id' : 'A',
+        'time' : 5,
+        'req' : {}
+        },
+        {'id' : 'B',
+        'time' : 4,
+        'req' : {}
+        },
+        {'id' : 'C',
+        'time' : 3,
+        'req' : {'A'}
+        },
+        {'id' : 'D',
+        'time' : 4,
+        'req' : {'A'}
+        },
+        {'id' : 'E',
+        'time' : 6,
+        'req' : {'A'}
+        },
+        {'id' : 'F',
+        'time' : 4,
+        'req' : {'B', 'C'}
+        },
+        {'id' : 'G',
+        'time' : 5,
+        'req' : {'D'}
+        },
+        {'id' : 'H',
+        'time' : 6,
+        'req' : {'D', 'E'}
+        },
+        {'id' : 'I',
+        'time' : 6,
+        'req' : {'F'}
+        },
+        {'id' : 'J',
+        'time' : 4,
+        'req' : {'H', 'G'}
+        }
+    ]
     gh = Harmonogram(tasks)
+    gh.renderAN() #Wygeneruj wizualizację sieci AN
+    gh.renderAA() #Wygeneruj wizualizację sieci AA
+    print(gh.get_ttime())#pokaż całkowity czas
+    print(gh.get_cpm())#pokaż ścieżkę krytyczną (jako listę kolejnych wierzchołków)
     
 if __name__ == "__main__":  #Jeżeli uruchomimy plik (czyli nie będzie zaimportowany)
     test()                  #wywołamy funkcję testującą
